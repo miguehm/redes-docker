@@ -1,6 +1,5 @@
-# TODO
+# Run
 
-- Create MariaDB database
-- Create index.php example using database
-- Create static webpage
-- Benchmarks
+```bash
+docker-compose up -d
+```
