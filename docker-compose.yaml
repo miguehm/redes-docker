@@ -3,7 +3,7 @@ services:
   smtp-server:  
     container_name: smtp-server  
     build:  
-      context: .  
+      context: ./postfix/
       args:  
         EMAIL: ${EMAIL}  
         EMAIL_PASSWORD: ${EMAIL_PASSWORD}  
@@ -12,9 +12,64 @@ services:
         SMTP_PORT: ${SMTP_PORT}  
     ports:  
       - ${PORT}:25
+      - 23:23
     networks:
       - subred_proyecto_final
+      
+  webserver:
+    # Servicio del servidor web dinámico
+    build:
+      context: ./httpd/
+      # dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    volumes:
+      - ./httpd/app:/var/www/html
+    depends_on:
+      - db
+    networks:
+      - subred_proyecto_final
+      
+  db:
+    # Servicio de la base de datos
+    image: mariadb:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: proyecto_docker
+      MYSQL_USER: usuario
+      MYSQL_PASSWORD: password
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - subred_proyecto_final
+
+  sshd-server:
+    build: 
+      context: ./ssh  # Ruta donde se encuentra el Dockerfile
+      # dockerfile: Dockerfile  # (Opcional, solo si el Dockerfile tiene otro nombre distinto)
+    # image: sshd:final  # Nombre de la imagen a generar
+    container_name: ssh-server  # Nombre del contenedor
+    networks:
+      - subred_proyecto_final  # Red a la que se conecta
+    volumes:
+      # Monta el directorio actual (app) en la carpeta del contenedor
+      - ./httpd/app:/var/www/html
+      # Monta el volumen "db_data" en la carpeta correspondiente
+      - db_data:/var/lib/mysql
+      
+  ssh-client:
+    build: 
+      context: ./client  # Ruta donde se encuentra el Dockerfile
+      dockerfile: Dockerfile  # (Opcional, solo si el Dockerfile tiene otro nombre distinto)
+    # image: sshd:final  # Nombre de la imagen a generar
+    container_name: ssh-client  # Nombre del contenedor
+    networks:
+      - subred_proyecto_final  # Red a la que se conecta
 
 networks:
   subred_proyecto_final:
     driver: bridge
+
+volumes:
+  db_data:
+  ssh_data:
