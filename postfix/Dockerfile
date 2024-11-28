@@ -26,8 +26,6 @@ RUN service ssh start
 
 EXPOSE 23
 
-# CMD ["/usr/sbin/sshd", "-D"]
-
 RUN sh -c 'echo "root: ${EMAIL}" >> /etc/aliases' && \
     sh -c 'echo "${MAIL_NAME}" >> /etc/mailname' && \
     sh -c 'echo "[${SMTP_DOMAIN}]:${SMTP_PORT} ${EMAIL}:${EMAIL_PASSWORD}" >> /etc/postfix/sasl_passwd' && \
