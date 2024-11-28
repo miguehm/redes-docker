@@ -15,14 +15,14 @@ services:
     networks:
       subred_proyecto_final:
         ipv4_address: 192.168.1.2
-  
+
   webserver:
     container_name: apache-server
     build:
       context: ./httpd/
     ports:
       - "8080:80"
-      - 24:24
+      # - 24:24
     volumes:
       - ./httpd/app:/var/www/html
     depends_on:
@@ -33,12 +33,8 @@ services:
 
   db:
     container_name: db
-    image: mariadb:latest
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: proyecto_docker
-      MYSQL_USER: usuario
-      MYSQL_PASSWORD: password
+    build:
+      context: ./db
     # ports:
     #   - 26:26
     volumes:
@@ -46,17 +42,6 @@ services:
     networks:
       subred_proyecto_final:
         ipv4_address: 192.168.1.4
-
-  # ssh-server:
-  #   container_name: ssh-server
-  #   build:
-  #     context: ./ssh
-  #   networks:
-  #     subred_proyecto_final:
-  #       ipv4_address: 192.168.1.5
-  #   volumes:
-  #     - ./httpd/app:/var/www/html
-  #     - db_data:/var/lib/mysql
 
   ssh-client:
     container_name: ssh-client
